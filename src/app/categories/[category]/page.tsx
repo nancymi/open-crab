@@ -3,13 +3,20 @@ import { prisma } from '@/lib/db';
 import { ToolGrid } from '@/components/tools/ToolGrid';
 
 export async function generateStaticParams() {
-  const categories = await prisma.category.findMany({
-    select: { slug: true },
-  });
+  try {
+    const categories = await prisma.category.findMany({
+      select: { slug: true },
+    });
 
-  return categories.map((category) => ({
-    category: category.slug,
-  }));
+    return categories.map((category) => ({
+      category: category.slug,
+    }));
+  } catch (error) {
+    // During initial build, database may not be available yet
+    // Return empty array to skip static generation
+    console.log('Database not available during build, skipping static generation');
+    return [];
+  }
 }
 
 export default async function CategoryPage({

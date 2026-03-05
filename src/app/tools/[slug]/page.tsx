@@ -7,14 +7,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 export async function generateStaticParams() {
-  const tools = await prisma.tool.findMany({
-    select: { slug: true },
-    take: 100, // Generate static pages for top 100 tools
-  });
+  try {
+    const tools = await prisma.tool.findMany({
+      select: { slug: true },
+      take: 100, // Generate static pages for top 100 tools
+    });
 
-  return tools.map((tool) => ({
-    slug: tool.slug,
-  }));
+    return tools.map((tool) => ({
+      slug: tool.slug,
+    }));
+  } catch (error) {
+    // During initial build, database may not be available yet
+    // Return empty array to skip static generation
+    console.log('Database not available during build, skipping static generation');
+    return [];
+  }
 }
 
 export default async function ToolPage({

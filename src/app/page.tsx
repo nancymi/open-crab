@@ -14,37 +14,45 @@ export default async function Home({
   const search = typeof params.search === 'string' ? params.search : undefined;
   const category = typeof params.category === 'string' ? params.category : undefined;
 
-  // Build where clause
-  const where: any = {};
+  let tools: any[] = [];
 
-  if (category) {
-    const categoryRecord = await prisma.category.findUnique({
-      where: { slug: category },
-    });
-    if (categoryRecord) {
-      where.categoryId = categoryRecord.id;
+  try {
+    // Build where clause
+    const where: any = {};
+
+    if (category) {
+      const categoryRecord = await prisma.category.findUnique({
+        where: { slug: category },
+      });
+      if (categoryRecord) {
+        where.categoryId = categoryRecord.id;
+      }
     }
-  }
 
-  if (search) {
-    where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
-    ];
-  }
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
 
-  // Fetch latest tools
-  const tools = await prisma.tool.findMany({
-    where,
-    include: {
-      category: true,
-      tags: true,
-    },
-    orderBy: {
-      publishedAt: 'desc',
-    },
-    take: 12,
-  });
+    // Fetch latest tools
+    tools = await prisma.tool.findMany({
+      where,
+      include: {
+        category: true,
+        tags: true,
+      },
+      orderBy: {
+        publishedAt: 'desc',
+      },
+      take: 12,
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    // Return empty array if database is not available
+    tools = [];
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
