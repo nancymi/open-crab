@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/collect-github",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/collect-reddit",
+      "schedule": "30 */6 * * *"
+    },
+    {
+      "path": "/api/cron/collect-medium",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/collect-producthunt",
+      "schedule": "30 */6 * * *"
+    }
+  ]
+}
