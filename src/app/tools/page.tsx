@@ -3,6 +3,7 @@ import { ToolGrid } from '@/components/tools/ToolGrid';
 import { SearchBar } from '@/components/filters/SearchBar';
 import { CategoryFilter } from '@/components/filters/CategoryFilter';
 import { Button } from '@/components/ui/button';
+import { mockTools } from '@/lib/mock-data';
 
 export default async function ToolsPage({
   searchParams,
@@ -35,21 +36,27 @@ export default async function ToolsPage({
   }
 
   // Fetch tools and total count
-  const [tools, total] = await Promise.all([
-    prisma.tool.findMany({
-      where,
-      include: {
-        category: true,
-        tags: true,
-      },
-      orderBy: {
-        publishedAt: 'desc',
-      },
-      take: limit,
-      skip: offset,
-    }),
-    prisma.tool.count({ where }),
-  ]);
+  let tools = mockTools;
+  let total = mockTools.length;
+  try {
+    [tools, total] = await Promise.all([
+      prisma.tool.findMany({
+        where,
+        include: {
+          category: true,
+          tags: true,
+        },
+        orderBy: {
+          publishedAt: 'desc',
+        },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.tool.count({ where }),
+    ]);
+  } catch {
+    // DB unavailable — mock data already set above
+  }
 
   const hasMore = offset + limit < total;
   const hasPrevious = offset > 0;
@@ -81,7 +88,7 @@ export default async function ToolsPage({
             </form>
           )}
 
-          <span className="flex items-center text-sm text-gray-600">
+          <span className="flex items-center text-sm text-gray-600 dark:text-gray-400">
             Showing {offset + 1} - {Math.min(offset + limit, total)} of {total}
           </span>
 
