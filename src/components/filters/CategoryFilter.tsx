@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 
 const categories = [
-  { slug: '', name: 'All Categories' },
+  { slug: 'all', name: 'All Categories' },
   { slug: 'llms-chatbots', name: 'LLMs & Chatbots' },
   { slug: 'image-generation', name: 'Image Generation' },
   { slug: 'code-assistants', name: 'Code Assistants' },
@@ -22,12 +22,12 @@ const categories = [
 export function CategoryFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentCategory = searchParams.get('category') || '';
+  const currentCategory = searchParams.get('category') || 'all';
 
   const handleCategoryChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (value) {
+    if (value && value !== 'all') {
       params.set('category', value);
     } else {
       params.delete('category');

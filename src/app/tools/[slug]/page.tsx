@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { mockTools } from '@/lib/mock-data';
 
 export async function generateStaticParams() {
   try {
@@ -31,13 +32,18 @@ export default async function ToolPage({
 }) {
   const { slug } = await params;
 
-  const tool = await prisma.tool.findUnique({
-    where: { slug },
-    include: {
-      category: true,
-      tags: true,
-    },
-  });
+  let tool = null;
+  try {
+    tool = await prisma.tool.findUnique({
+      where: { slug },
+      include: {
+        category: true,
+        tags: true,
+      },
+    });
+  } catch {
+    tool = mockTools.find((t) => t.slug === slug) ?? null;
+  }
 
   if (!tool) {
     notFound();
@@ -106,7 +112,7 @@ export default async function ToolPage({
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Category</p>
                 <Link href={`/categories/${tool.category.slug}`}>
-                  <Badge variant="outline" className="hover:bg-orange-50 transition">
+                  <Badge variant="outline" className="hover:bg-orange-50 dark:hover:bg-orange-900/20 transition">
                     {tool.category.name}
                   </Badge>
                 </Link>

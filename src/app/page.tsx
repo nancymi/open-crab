@@ -4,6 +4,7 @@ import { ToolGrid } from '@/components/tools/ToolGrid';
 import { SearchBar } from '@/components/filters/SearchBar';
 import { CategoryFilter } from '@/components/filters/CategoryFilter';
 import { Button } from '@/components/ui/button';
+import { mockTools } from '@/lib/mock-data';
 
 export default async function Home({
   searchParams,
@@ -48,10 +49,8 @@ export default async function Home({
       },
       take: 12,
     });
-  } catch (error) {
-    console.error('Database error:', error);
-    // Return empty array if database is not available
-    tools = [];
+  } catch {
+    tools = mockTools;
   }
 
   return (

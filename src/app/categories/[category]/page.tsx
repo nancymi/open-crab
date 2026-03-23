@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { ToolGrid } from '@/components/tools/ToolGrid';
+import { mockTools, mockCategories } from '@/lib/mock-data';
 
 export async function generateStaticParams() {
   try {
@@ -26,27 +27,29 @@ export default async function CategoryPage({
 }) {
   const { category: categorySlug } = await params;
 
-  const category = await prisma.category.findUnique({
-    where: { slug: categorySlug },
-  });
+  let category = null;
+  let tools = mockTools;
+  try {
+    category = await prisma.category.findUnique({
+      where: { slug: categorySlug },
+    });
+
+    if (category) {
+      tools = await prisma.tool.findMany({
+        where: { categoryId: category.id },
+        include: { category: true, tags: true },
+        orderBy: { publishedAt: 'desc' },
+        take: 50,
+      });
+    }
+  } catch {
+    category = mockCategories.find((c) => c.slug === categorySlug) ?? null;
+    tools = mockTools.filter((t) => t.category?.slug === categorySlug);
+  }
 
   if (!category) {
     notFound();
   }
-
-  const tools = await prisma.tool.findMany({
-    where: {
-      categoryId: category.id,
-    },
-    include: {
-      category: true,
-      tags: true,
-    },
-    orderBy: {
-      publishedAt: 'desc',
-    },
-    take: 50,
-  });
 
   return (
     <div className="container mx-auto px-4 py-8">

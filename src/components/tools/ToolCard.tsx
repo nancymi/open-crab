@@ -66,7 +66,7 @@ export function ToolCard({ tool }: ToolCardProps) {
         {tool.category && (
           <div className="mt-3">
             <Link href={`/categories/${tool.category.slug}`}>
-              <Badge variant="outline" className="text-xs hover:bg-orange-50 transition">
+              <Badge variant="outline" className="text-xs hover:bg-orange-50 dark:hover:bg-orange-900/20 transition">
                 {tool.category.name}
               </Badge>
             </Link>
